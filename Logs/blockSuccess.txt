@@ -1,0 +1,34 @@
+[Info   :Timed Hit Mod] [Block.BeginInputPhase] PRE  | windowMult=1.00
+[Debug  :Timed Hit Mod] [Block.CanPressInput] PRE  | handler=TimedBlockHandler
+[Debug  :Timed Hit Mod] [Block.CanPressInput] POST | result=False
+[Info   :Timed Hit Mod] [Block.BeginInputPhase] POST | block window open
+[Debug  :Timed Hit Mod] [Block.CanPressInput] PRE  | handler=TimedBlockHandler
+[Debug  :Timed Hit Mod] [Block.CanPressInput] POST | result=True
+[Debug  :Timed Hit Mod] [Block.CanPressInput] PRE  | handler=TimedBlockHandler
+[Debug  :Timed Hit Mod] [Block.CanPressInput] POST | result=False
+[Debug  :Timed Hit Mod] [Block.CanPressInput] PRE  | handler=TimedBlockHandler
+[Debug  :Timed Hit Mod] [Block.CanPressInput] POST | result=True
+[Info   :Timed Hit Mod] [Block.OnInputPressed] PRE  | handler=TimedBlockHandler
+[Info   :Timed Hit Mod] [Block.OnInputPressed] POST | press registered
+[Debug  :Timed Hit Mod] [Block.CanPressInput] PRE  | handler=TimedBlockHandler
+[Debug  :Timed Hit Mod] [Block.CanPressInput] POST | result=True
+[Info   :Timed Hit Mod] [Block.OnInputPressed] PRE  | handler=TimedBlockHandler
+[Info   :Timed Hit Mod] [Block.OnInputPressed] POST | press registered
+[Debug  :Timed Hit Mod] [Block.CanPressInput] PRE  | handler=TimedBlockHandler
+[Debug  :Timed Hit Mod] [Block.CanPressInput] POST | result=True
+[Info   :Timed Hit Mod] [Block.OnInputPressed] PRE  | handler=TimedBlockHandler
+[Info   :Timed Hit Mod] [Block.OnInputPressed] POST | press registered
+[Info   :Timed Hit Mod] [Block.GetResult] PRE  | handler=TimedBlockHandler
+[Debug  :Timed Hit Mod] [Block.CanPressInput] PRE  | handler=TimedBlockHandler
+[Debug  :Timed Hit Mod] [Block.CanPressInput] POST | result=False
+[Debug  :Timed Hit Mod] [TeamQTEResult.GetBestResult] PRE  | qteId=246
+[Debug  :Timed Hit Mod] [TeamQTEResult.GetBestResult] POST | best=SuccessBeforeEvent isSuccess=True
+[Info   :Timed Hit Mod] [Block.GetResult] POST | bestResult=SuccessBeforeEvent
+[Info   :Timed Hit Mod] [Block.EndInputPhase] PRE  | handler=TimedBlockHandler
+[Debug  :Timed Hit Mod] [Block.CanPressInput] PRE  | handler=TimedBlockHandler
+[Debug  :Timed Hit Mod] [Block.CanPressInput] POST | result=False
+[Info   :Timed Hit Mod] [Block.EndInputPhase] POST | block window closed
+[Info   :Timed Hit Mod] [Block.EndInputPhase] PRE  | handler=TimedBlockHandler
+[Debug  :Timed Hit Mod] [Block.CanPressInput] PRE  | handler=TimedBlockHandler
+[Debug  :Timed Hit Mod] [Block.CanPressInput] POST | result=False
+[Info   :Timed Hit Mod] [Block.EndInputPhase] POST | block window closed
