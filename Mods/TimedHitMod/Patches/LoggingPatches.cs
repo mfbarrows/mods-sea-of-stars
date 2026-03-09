@@ -644,3 +644,307 @@ static class Log_PercentageHeal_GetHealAmount
         => Plugin.LogI(
             $"[PercentageHeal.GetHealAmount] POST | healAmount={__result}");
 }
+
+
+// // ──────────────────────────────────────────────────────────────────────
+// // SunboyShootQTESunballState  (Solar Rain / Soonrang sunball QTE)
+// // Every method logged so we can trace the exact call sequence.
+// // ──────────────────────────────────────────────────────────────────────
+
+// [HarmonyPatch(typeof(SunboyShootQTESunballState), "StateEnter")]
+// static class Log_SunboyQTE_StateEnter
+// {
+//     static void Prefix()  => Plugin.LogD("[QTESunballState] >> StateEnter");
+//     static void Postfix() => Plugin.LogD("[QTESunballState] << StateEnter");
+// }
+
+// [HarmonyPatch(typeof(SunboyShootQTESunballState), "StateExit")]
+// static class Log_SunboyQTE_StateExit
+// {
+//     static void Prefix()  => Plugin.LogD("[QTESunballState] >> StateExit");
+//     static void Postfix() => Plugin.LogD("[QTESunballState] << StateExit");
+// }
+
+// [HarmonyPatch(typeof(SunboyShootQTESunballState), "StateExecute")]
+// static class Log_SunboyQTE_StateExecute
+// {
+//     static void Prefix()  => Plugin.LogD("[QTESunballState] >> StateExecute");
+//     static void Postfix() => Plugin.LogD("[QTESunballState] << StateExecute");
+// }
+
+// [HarmonyPatch(typeof(SunboyShootQTESunballState), "BeginDisplayInstructions")]
+// static class Log_SunboyQTE_BeginDisplayInstructions
+// {
+//     static void Prefix()  => Plugin.LogD("[QTESunballState] >> BeginDisplayInstructions");
+//     static void Postfix() => Plugin.LogD("[QTESunballState] << BeginDisplayInstructions");
+// }
+
+// [HarmonyPatch(typeof(SunboyShootQTESunballState), "BeginIn")]
+// static class Log_SunboyQTE_BeginIn
+// {
+//     static void Prefix()  => Plugin.LogD("[QTESunballState] >> BeginIn");
+//     static void Postfix() => Plugin.LogD("[QTESunballState] << BeginIn");
+// }
+
+// [HarmonyPatch(typeof(SunboyShootQTESunballState), "UpdateIn")]
+// static class Log_SunboyQTE_UpdateIn
+// {
+//     static void Prefix()  => Plugin.LogD("[QTESunballState] >> UpdateIn");
+//     static void Postfix() => Plugin.LogD("[QTESunballState] << UpdateIn");
+// }
+
+// [HarmonyPatch(typeof(SunboyShootQTESunballState), "BeginCharge")]
+// static class Log_SunboyQTE_BeginCharge
+// {
+//     static void Prefix()  => Plugin.LogD("[QTESunballState] >> BeginCharge");
+//     static void Postfix() => Plugin.LogD("[QTESunballState] << BeginCharge");
+// }
+
+// [HarmonyPatch(typeof(SunboyShootQTESunballState), "SpawnSunball")]
+// static class Log_SunboyQTE_SpawnSunball
+// {
+//     static void Prefix()  => Plugin.LogD("[QTESunballState] >> SpawnSunball");
+//     static void Postfix() => Plugin.LogD("[QTESunballState] << SpawnSunball");
+// }
+
+// [HarmonyPatch(typeof(SunboyShootQTESunballState), "UpdateCharging")]
+// static class Log_SunboyQTE_UpdateCharging
+// {
+//     static void Prefix()  => Plugin.LogD("[QTESunballState] >> UpdateCharging");
+//     static void Postfix() => Plugin.LogD("[QTESunballState] << UpdateCharging");
+// }
+
+// [HarmonyPatch(typeof(SunboyShootQTESunballState), "UpdateSunballCharge")]
+// static class Log_SunboyQTE_UpdateSunballCharge
+// {
+//     static void Prefix()  => Plugin.LogD("[QTESunballState] >> UpdateSunballCharge");
+//     static void Postfix() => Plugin.LogD("[QTESunballState] << UpdateSunballCharge");
+// }
+
+// [HarmonyPatch(typeof(SunboyShootQTESunballState), "OnReachedMaxCharge")]
+// static class Log_SunboyQTE_OnReachedMaxCharge
+// {
+//     static void Prefix()  => Plugin.LogD("[QTESunballState] >> OnReachedMaxCharge");
+//     static void Postfix() => Plugin.LogD("[QTESunballState] << OnReachedMaxCharge");
+// }
+
+// [HarmonyPatch(typeof(SunboyShootQTESunballState), "OnWentPastMaxCharge")]
+// static class Log_SunboyQTE_OnWentPastMaxCharge
+// {
+//     static void Prefix()  => Plugin.LogD("[QTESunballState] >> OnWentPastMaxCharge");
+//     static void Postfix() => Plugin.LogD("[QTESunballState] << OnWentPastMaxCharge");
+// }
+
+// [HarmonyPatch(typeof(SunboyShootQTESunballState), "BeginShoot")]
+// static class Log_SunboyQTE_BeginShoot
+// {
+//     static void Prefix()  => Plugin.LogD("[QTESunballState] >> BeginShoot");
+//     static void Postfix() => Plugin.LogD("[QTESunballState] << BeginShoot");
+// }
+
+// [HarmonyPatch(typeof(SunboyShootQTESunballState), "ThrowSunball")]
+// static class Log_SunboyQTE_ThrowSunball
+// {
+//     static void Prefix()  => Plugin.LogD("[QTESunballState] >> ThrowSunball");
+//     static void Postfix() => Plugin.LogD("[QTESunballState] << ThrowSunball");
+// }
+
+// [HarmonyPatch(typeof(SunboyShootQTESunballState), "OnShootSunball")]
+// static class Log_SunboyQTE_OnShootSunball
+// {
+//     static void Prefix()  => Plugin.LogD("[QTESunballState] >> OnShootSunball");
+//     static void Postfix() => Plugin.LogD("[QTESunballState] << OnShootSunball");
+// }
+
+// [HarmonyPatch(typeof(SunboyShootQTESunballState), "HasQTESuccess")]
+// static class Log_SunboyQTE_HasQTESuccess
+// {
+//     static void Prefix()              => Plugin.LogD("[QTESunballState] >> HasQTESuccess");
+//     static void Postfix(bool __result) => Plugin.LogD($"[QTESunballState] << HasQTESuccess -> {__result}");
+// }
+
+// [HarmonyPatch(typeof(SunboyShootQTESunballState), "HasAdditionalPlayers")]
+// static class Log_SunboyQTE_HasAdditionalPlayers
+// {
+//     static void Prefix()              => Plugin.LogD("[QTESunballState] >> HasAdditionalPlayers");
+//     static void Postfix(bool __result) => Plugin.LogD($"[QTESunballState] << HasAdditionalPlayers -> {__result}");
+// }
+
+// [HarmonyPatch(typeof(SunboyShootQTESunballState), "IsWaitingForAdditionalPlayers")]
+// static class Log_SunboyQTE_IsWaitingForAdditionalPlayers
+// {
+//     static void Prefix()              => Plugin.LogD("[QTESunballState] >> IsWaitingForAdditionalPlayers");
+//     static void Postfix(bool __result) => Plugin.LogD($"[QTESunballState] << IsWaitingForAdditionalPlayers -> {__result}");
+// }
+
+// [HarmonyPatch(typeof(SunboyShootQTESunballState), "GatherAdditionalPlayers")]
+// static class Log_SunboyQTE_GatherAdditionalPlayers
+// {
+//     static void Prefix()  => Plugin.LogD("[QTESunballState] >> GatherAdditionalPlayers");
+//     static void Postfix() => Plugin.LogD("[QTESunballState] << GatherAdditionalPlayers");
+// }
+
+// [HarmonyPatch(typeof(SunboyShootQTESunballState), "UpdateAdditionalPlayers")]
+// static class Log_SunboyQTE_UpdateAdditionalPlayers
+// {
+//     static void Prefix()  => Plugin.LogD("[QTESunballState] >> UpdateAdditionalPlayers");
+//     static void Postfix() => Plugin.LogD("[QTESunballState] << UpdateAdditionalPlayers");
+// }
+
+// [HarmonyPatch(typeof(SunboyShootQTESunballState), "DoAdditionalPlayersQTEFeedback")]
+// static class Log_SunboyQTE_DoAdditionalPlayersQTEFeedback
+// {
+//     static void Prefix()  => Plugin.LogD("[QTESunballState] >> DoAdditionalPlayersQTEFeedback");
+//     static void Postfix() => Plugin.LogD("[QTESunballState] << DoAdditionalPlayersQTEFeedback");
+// }
+
+// [HarmonyPatch(typeof(SunboyShootQTESunballState), "UpdateEndPause")]
+// static class Log_SunboyQTE_UpdateEndPause
+// {
+//     static void Prefix()  => Plugin.LogD("[QTESunballState] >> UpdateEndPause");
+//     static void Postfix() => Plugin.LogD("[QTESunballState] << UpdateEndPause");
+// }
+
+// [HarmonyPatch(typeof(SunboyShootQTESunballState), "DoRecoil")]
+// static class Log_SunboyQTE_DoRecoil
+// {
+//     static void Prefix()  => Plugin.LogD("[QTESunballState] >> DoRecoil");
+//     static void Postfix() => Plugin.LogD("[QTESunballState] << DoRecoil");
+// }
+
+// [HarmonyPatch(typeof(SunboyShootQTESunballState), "UpdateRecoil")]
+// static class Log_SunboyQTE_UpdateRecoil
+// {
+//     static void Prefix()  => Plugin.LogD("[QTESunballState] >> UpdateRecoil");
+//     static void Postfix() => Plugin.LogD("[QTESunballState] << UpdateRecoil");
+// }
+
+
+// // ──────────────────────────────────────────────────────────────────────
+// // SunboyShootSunballState  (non-QTE sunball shoot state)
+// // ──────────────────────────────────────────────────────────────────────
+
+// [HarmonyPatch(typeof(SunboyShootSunballState), "StateEnter")]
+// static class Log_ShootSunball_StateEnter
+// {
+//     static void Prefix()  => Plugin.LogD("[SunballState] >> StateEnter");
+//     static void Postfix() => Plugin.LogD("[SunballState] << StateEnter");
+// }
+
+// [HarmonyPatch(typeof(SunboyShootSunballState), "StateExecute")]
+// static class Log_ShootSunball_StateExecute
+// {
+//     static void Prefix()  => Plugin.LogD("[SunballState] >> StateExecute");
+//     static void Postfix() => Plugin.LogD("[SunballState] << StateExecute");
+// }
+
+// [HarmonyPatch(typeof(SunboyShootSunballState), "StateExit")]
+// static class Log_ShootSunball_StateExit
+// {
+//     static void Prefix()  => Plugin.LogD("[SunballState] >> StateExit");
+//     static void Postfix() => Plugin.LogD("[SunballState] << StateExit");
+// }
+
+// [HarmonyPatch(typeof(SunboyShootSunballState), "OnSpawnSunball")]
+// static class Log_ShootSunball_OnSpawnSunball
+// {
+//     static void Prefix()  => Plugin.LogD("[SunballState] >> OnSpawnSunball");
+//     static void Postfix() => Plugin.LogD("[SunballState] << OnSpawnSunball");
+// }
+
+// [HarmonyPatch(typeof(SunboyShootSunballState), "UpdateSunballCharge")]
+// static class Log_ShootSunball_UpdateSunballCharge
+// {
+//     static void Prefix()  => Plugin.LogD("[SunballState] >> UpdateSunballCharge");
+//     static void Postfix() => Plugin.LogD("[SunballState] << UpdateSunballCharge");
+// }
+
+// [HarmonyPatch(typeof(SunboyShootSunballState), nameof(SunboyShootSunballState.ThrowSunball))]
+// static class Log_ShootSunball_ThrowSunball
+// {
+//     static void Prefix(float normalizedTime)  => Plugin.LogD($"[SunballState] >> ThrowSunball normalizedTime={normalizedTime:F3}");
+//     static void Postfix()                     => Plugin.LogD("[SunballState] << ThrowSunball");
+// }
+
+// [HarmonyPatch(typeof(SunboyShootSunballState), "OnShootSunball")]
+// static class Log_ShootSunball_OnShootSunball
+// {
+//     static void Prefix()  => Plugin.LogD("[SunballState] >> OnShootSunball");
+//     static void Postfix() => Plugin.LogD("[SunballState] << OnShootSunball");
+// }
+
+// [HarmonyPatch(typeof(SunboyShootSunballState), "DoRecoil")]
+// static class Log_ShootSunball_DoRecoil
+// {
+//     static void Prefix()  => Plugin.LogD("[SunballState] >> DoRecoil");
+//     static void Postfix() => Plugin.LogD("[SunballState] << DoRecoil");
+// }
+
+// [HarmonyPatch(typeof(SunboyShootSunballState), "UpdateRecoil")]
+// static class Log_ShootSunball_UpdateRecoil
+// {
+//     static void Prefix()  => Plugin.LogD("[SunballState] >> UpdateRecoil");
+//     static void Postfix() => Plugin.LogD("[SunballState] << UpdateRecoil");
+// }
+
+// [HarmonyPatch(typeof(SunboyShootSunballState), "SetDefaultValues")]
+// static class Log_ShootSunball_SetDefaultValues
+// {
+//     static void Prefix()  => Plugin.LogD("[SunballState] >> SetDefaultValues");
+//     static void Postfix() => Plugin.LogD("[SunballState] << SetDefaultValues");
+// }
+
+// [HarmonyPatch(typeof(SunboyShootSunballState), nameof(SunboyShootSunballState.GetTimeAfterShot))]
+// static class Log_ShootSunball_GetTimeAfterShot
+// {
+//     static void Prefix()           => Plugin.LogD("[SunballState] >> GetTimeAfterShot");
+//     static void Postfix(float __result) => Plugin.LogD($"[SunballState] << GetTimeAfterShot -> {__result:F3}");
+// }
+
+// [HarmonyPatch(typeof(SunboyShootSunballState), nameof(SunboyShootSunballState.GetRecoilEndPosition))]
+// static class Log_ShootSunball_GetRecoilEndPosition
+// {
+//     static void Prefix()  => Plugin.LogD("[SunballState] >> GetRecoilEndPosition");
+//     static void Postfix() => Plugin.LogD("[SunballState] << GetRecoilEndPosition");
+// }
+
+// [HarmonyPatch(typeof(SunboyShootSunballState), "get_ReadyToShoot")]
+// static class Log_ShootSunball_ReadyToShoot
+// {
+//     static void Postfix(bool __result) => Plugin.LogD($"[SunballState] << ReadyToShoot -> {__result}");
+// }
+
+
+// // ──────────────────────────────────────────────────────────────────────
+// // SunballProjectile  (projectile level tracking)
+// // ──────────────────────────────────────────────────────────────────────
+
+// [HarmonyPatch(typeof(SunballProjectile), nameof(SunballProjectile.IncreaseLevel))]
+// static class Log_SunballProjectile_IncreaseLevel
+// {
+//     static void Prefix(SunballProjectile __instance)
+//         => Plugin.LogD($"[SunballProjectile] >> IncreaseLevel");
+
+//     static void Postfix(SunballProjectile __instance)
+//         => Plugin.LogD($"[SunballProjectile] << IncreaseLevel");
+// }
+
+// [HarmonyPatch(typeof(SunballProjectile), nameof(SunballProjectile.DecreaseLevel))]
+// static class Log_SunballProjectile_DecreaseLevel
+// {
+//     static void Prefix(SunballProjectile __instance)
+//         => Plugin.LogD($"[SunballProjectile] >> DecreaseLevel");
+
+//     static void Postfix(SunballProjectile __instance)
+//         => Plugin.LogD($"[SunballProjectile] << DecreaseLevel");
+// }
+
+// [HarmonyPatch(typeof(SunballProjectile), "SetLevel")]
+// static class Log_SunballProjectile_SetLevel
+// {
+//     static void Prefix(SunballProjectile __instance, int level)
+//         => Plugin.LogD($"[SunballProjectile] >> SetLevel | current={__instance.Level} new={level}");
+
+//     static void Postfix(SunballProjectile __instance)
+//         => Plugin.LogD($"[SunballProjectile] << SetLevel | level={__instance.Level}");
+// }
