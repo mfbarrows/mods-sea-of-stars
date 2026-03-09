@@ -13,6 +13,7 @@
     <PluginsPath>$(GameInstallPath)\BepInEx\plugins</PluginsPath>
 
     <DebugType>none</DebugType>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <DebugSymbols>false</DebugSymbols>
   </PropertyGroup>
 

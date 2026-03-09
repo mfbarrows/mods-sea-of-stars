@@ -15,6 +15,7 @@
     <!-- No PDB needed in plugins folder -->
     <DebugType>none</DebugType>
     <DebugSymbols>false</DebugSymbols>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
 
   <Target Name="CopyToPlugins" AfterTargets="Build">
