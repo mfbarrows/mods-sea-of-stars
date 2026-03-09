@@ -26,8 +26,12 @@ namespace TimedHitMod.Patches;
 
 static class FanOfKnivesCycleFlag
 {
-    internal static int TargetCount = 0;
     internal static int ThrowCount  = 0;
+    internal static int TargetCount = 0;
+
+    // Damage types this move deals (populated once per use at DoMove).
+    // Read by LockTracker.UpdateForEnemy to decide which enemies to re-add.
+    internal static Il2CppSystem.Collections.Generic.List<EDamageType> MoveDamageTypes = null!;
 }
 
 /// <summary>
@@ -36,11 +40,22 @@ static class FanOfKnivesCycleFlag
 [HarmonyPatch(typeof(SeraiFanOfKnives), "DoMove")]
 static class Patch_SeraiFanOfKnives_DoMove
 {
-    static void Prefix()
+    static void Prefix(SeraiFanOfKnives __instance)
     {
-        FanOfKnivesCycleFlag.ThrowCount = 0;
+        FanOfKnivesCycleFlag.ThrowCount  = 0;
+        FanOfKnivesCycleFlag.TargetCount = 0;
+
+        // Capture the damage types this move deals so LockTracker can filter
+        // enemies that still have matching spell locks.
+        FanOfKnivesCycleFlag.MoveDamageTypes = new Il2CppSystem.Collections.Generic.List<EDamageType>();
+        __instance.GetLocksDamageTypes(FanOfKnivesCycleFlag.MoveDamageTypes);
+
+        // Clear pending set from any previous move.
+        LockTracker.EnemiesPendingFanOfKnivesHit.Clear();
+
         Plugin.LogI(
-            $"[FanOfKnives.DoMove] PRE  | ThrowCount reset, TargetCount={FanOfKnivesCycleFlag.TargetCount}");
+            $"[FanOfKnives.DoMove] PRE  | ThrowCount reset, " +
+            $"MoveDamageTypes.Count={FanOfKnivesCycleFlag.MoveDamageTypes.Count}");
     }
 }
 
@@ -60,9 +75,16 @@ static class Patch_SeraiFanOfKnives_RefillAvailableTargetsLeft
             if (listPtr != IntPtr.Zero)
             {
                 var list = new Il2CppSystem.Collections.Generic.List<CombatTarget>(listPtr);
-                FanOfKnivesCycleFlag.TargetCount = list.Count;
                 Plugin.LogI(
-                    $"[FanOfKnives.RefillAvailableTargetsLeft] POST | TargetCount={FanOfKnivesCycleFlag.TargetCount}");
+                    $"[FanOfKnives.RefillAvailableTargetsLeft] POST | targets={list.Count} " +
+                    $"ThrowCount={FanOfKnivesCycleFlag.ThrowCount}");
+
+                // Seed the pending set only on the very first refill (move just started).
+                if (FanOfKnivesCycleFlag.ThrowCount == 0)
+                {
+                    LockTracker.InitAllTargets(list, LockTracker.EnemiesPendingFanOfKnivesHit);
+                    FanOfKnivesCycleFlag.TargetCount = list.Count;
+                }
             }
             else
             {
@@ -90,20 +112,43 @@ static class Patch_CanAutoTimeHit_FanOfKnives
             return; // other moves handled by Patch_CanAutoTimeHit in AutoTimeAttackPatches.cs
 
         int throws  = FanOfKnivesCycleFlag.ThrowCount;
-        int targets = FanOfKnivesCycleFlag.TargetCount;
 
-        if (throws < targets)
+        // Safety cap — should never be reached in normal play.
+        if (throws >= 20)
         {
-            __result = true;
-            FanOfKnivesCycleFlag.ThrowCount++;
+            __result = false;
             Plugin.LogI(
-                $"[CanAutoTimeHit] FanOfKnives | ThrowCount={throws} < TargetCount={targets} → auto-time (ThrowCount now {FanOfKnivesCycleFlag.ThrowCount})");
+                $"[CanAutoTimeHit] FanOfKnives | SAFETY CAP: ThrowCount={throws} >= 20 -- forcing stop");
+            return;
         }
-        else
+
+        int pending = LockTracker.EnemiesPendingFanOfKnivesHit.Count;
+
+        // No enemies left in the pending set.
+        if (pending == 0)
         {
-            // All enemies hit once — natural fail ends the move.
+            int needed = FanOfKnivesCycleFlag.TargetCount - 1;
+            if (throws < needed)
+            {
+                // Pending set emptied before we hit every target (e.g. boss arms sharing
+                // an owner pointer). Fall back to count-based: keep granting auto-time.
+                __result = true;
+                FanOfKnivesCycleFlag.ThrowCount++;
+                Plugin.LogW(
+                    $"[CanAutoTimeHit] FanOfKnives | WARNING: pending empty but throws={throws} < needed={needed} -- granting fallback auto-time");
+                return;
+            }
+            __result = false;
             Plugin.LogI(
-                $"[CanAutoTimeHit] FanOfKnives | ThrowCount={throws} >= TargetCount={targets} → stop, let move end");
+                $"[CanAutoTimeHit] FanOfKnives | pending set empty (ThrowCount={throws}) → stop");
+            return;
         }
+
+        // Pending enemies exist — grant auto-time.
+        __result = true;
+        FanOfKnivesCycleFlag.ThrowCount++;
+        Plugin.LogI(
+            $"[CanAutoTimeHit] FanOfKnives | pending={pending} ThrowCount={throws} → auto-time " +
+            $"(ThrowCount now {FanOfKnivesCycleFlag.ThrowCount})");
     }
 }

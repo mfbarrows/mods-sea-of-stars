@@ -15,6 +15,7 @@ public class Plugin : BasePlugin
 
     // Timestamp helpers -- use these everywhere instead of Plugin.Log.LogInfo/LogDebug directly.
     internal static void LogI(string msg) => Log.LogInfo($"[{DateTime.Now:HH:mm:ss.fff}] {msg}");
+    internal static void LogW(string msg) => Log.LogWarning($"[{DateTime.Now:HH:mm:ss.fff}] {msg}");
     internal static void LogD(string msg) => Log.LogDebug($"[{DateTime.Now:HH:mm:ss.fff}] {msg}");
 
     public override void Load()
