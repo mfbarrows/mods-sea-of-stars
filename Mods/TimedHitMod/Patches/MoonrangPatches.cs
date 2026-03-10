@@ -163,3 +163,37 @@ static class Patch_DeflectMoonrangState_GetQTEResult
             $"DeflectCount={MoonrangCycleFlag.DeflectCount})");
     }
 }
+
+/// <summary>
+/// Skip the instruction text + confirm-input wait for MoonrangSpecialMove.
+///
+/// Strategy: clear instructionsLocId before the coroutine starts.
+/// The coroutine's state-0 checks whether instructionsLocId is valid before
+/// showing UI. With the field zeroed, it takes the no-instructions branch
+/// directly: Play(ThrowMoonrangIn) → WaitForAnimationDone(ThrowMoonrangLoop)
+/// → ThrowMoonrang(). Animation and throw are fully preserved.
+///
+/// Soonrang.ShowInstructionsAndThrowMoonrangCoroutine (slot 59 override) is a
+/// separate compiled method that contains no instruction UI at all — it calls
+/// ThrowMoonrang() immediately and yields one frame. No patch needed there.
+/// </summary>
+[HarmonyPatch(typeof(MoonrangSpecialMove), "ShowInstructionsAndThrowMoonrangCoroutine")]
+static class Patch_MoonrangSpecialMove_SkipInstructions
+{
+    // instructionsLocId is a 16-byte value type (LocalizationId) at offset +0xD8
+    // on MoonrangSpecialMove (confirmed from dump.cs).
+    // The coroutine checks both 8-byte halves are non-null before showing UI.
+    // Zeroing them makes it take the no-instructions path, preserving the
+    // animation (Play ThrowMoonrangIn → WaitForAnimationDone → ThrowMoonrang).
+    // LocalizationId is in Sabotage.Localization which is not referenced, so
+    // we write the field via unsafe pointer rather than assigning the type directly.
+    private const int InstructionsLocIdOffset = 0xD8;
+
+    static unsafe void Prefix(MoonrangSpecialMove __instance)
+    {
+        Plugin.LogI("[Moonrang.ShowInstructions] Clearing instructionsLocId → skipping UI");
+        ulong* field = (ulong*)((byte*)__instance.Pointer + InstructionsLocIdOffset);
+        field[0] = 0;
+        field[1] = 0;
+    }
+}

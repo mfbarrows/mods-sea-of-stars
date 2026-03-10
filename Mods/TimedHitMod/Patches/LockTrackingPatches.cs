@@ -109,6 +109,12 @@ static class LockTracker
                 Plugin.LogI(
                     $"[LockTracker] Moonrang hit 0x{ptr:X} → removed (pending={EnemiesPendingMoonrangHit.Count})");
             }
+            else if (moveName.Contains("Soonrang"))
+            {
+                EnemiesPendingMoonrangHit.Remove(ptr);
+                Plugin.LogI(
+                    $"[LockTracker] Soonrang hit 0x{ptr:X} → removed (pending={EnemiesPendingMoonrangHit.Count})");
+            }
             else if (moveName.Contains("SeraiFanOfKnives"))
             {
                 EnemiesPendingFanOfKnivesHit.Remove(ptr);
@@ -178,7 +184,7 @@ static class Patch_HitData_SetQTEResult_LockTracking
     {
         if (__instance.combatMove == null) return;
         string name = __instance.combatMove.name;
-        if (name.Contains("Moonrang") || name.Contains("SeraiFanOfKnives"))
+        if (name.Contains("Moonrang") || name.Contains("Soonrang") || name.Contains("FanOfKnives"))
             LockTracker.OnHitApplied(__instance, name);
     }
 }

@@ -152,3 +152,21 @@ static class Patch_CanAutoTimeHit_FanOfKnives
             $"(ThrowCount now {FanOfKnivesCycleFlag.ThrowCount})");
     }
 }
+
+/// <summary>
+/// Skip the instruction text + confirm-input wait for all moves that delegate
+/// to PlayerCombatMove.ShowInstructions.
+/// Confirmed callers: SeraiFanOfKnives (OpenPortalsCoroutine),
+///                    ConflagrateCombatMove (InstructionsCoroutine).
+/// Also covers any other PlayerCombatMove subclass that uses the same base method.
+/// </summary>
+[HarmonyPatch(typeof(PlayerCombatMove), "ShowInstructions")]
+static class Patch_PlayerCombatMove_SkipInstructions
+{
+    static bool Prefix(PlayerCombatMove __instance, ref Il2CppSystem.Collections.IEnumerator __result)
+    {
+        Plugin.LogI($"[ShowInstructions] Skipping for {__instance.GetType().Name}");
+        __result = new Il2CppSystem.Collections.ArrayList(0).GetEnumerator();
+        return false;
+    }
+}
