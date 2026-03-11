@@ -23,12 +23,12 @@ static class Log_AttackHandler_BeginInputPhase
 {
     static void Prefix(AbstractTimedAttackHandler __instance)
         => Plugin.LogI(
-            $"[Attack.BeginInputPhase] PRE  | handler={__instance.GetType().Name} " +
+            $"[AbstractTimedAttackHandler] >> BeginInputPhase  | handler={__instance.GetType().Name} " +
             $"windowMult={__instance.WindowDurationMultiplier:F2}");
 
     static void Postfix(AbstractTimedAttackHandler __instance)
         => Plugin.LogI(
-            $"[Attack.BeginInputPhase] POST | handler={__instance.GetType().Name} -- window is now open");
+            $"[AbstractTimedAttackHandler] << BeginInputPhase | handler={__instance.GetType().Name} -- window is now open");
 }
 
 /// <summary>EndInputPhase -- the QTE timing window has closed.</summary>
@@ -37,11 +37,11 @@ static class Log_AttackHandler_EndInputPhase
 {
     static void Prefix(AbstractTimedAttackHandler __instance)
         => Plugin.LogI(
-            $"[Attack.EndInputPhase] PRE  | handler={__instance.GetType().Name}");
+            $"[AbstractTimedAttackHandler] >> EndInputPhase  | handler={__instance.GetType().Name}");
 
     static void Postfix(AbstractTimedAttackHandler __instance)
         => Plugin.LogI(
-            $"[Attack.EndInputPhase] POST | handler={__instance.GetType().Name} -- window closed");
+            $"[AbstractTimedAttackHandler] << EndInputPhase | handler={__instance.GetType().Name} -- window closed");
 }
 
 /// <summary>OnInputPressed -- the player pressed the button during an attack window.</summary>
@@ -50,12 +50,12 @@ static class Log_AttackHandler_OnInputPressed
 {
     static void Prefix(AbstractTimedAttackHandler __instance)
         => Plugin.LogI(
-            $"[Attack.OnInputPressed] PRE  | handler={__instance.GetType().Name} " +
+            $"[AbstractTimedAttackHandler] >> OnInputPressed  | handler={__instance.GetType().Name} " +
             $"doQTEFeedback={__instance.doQTEResultFeedback}");
 
     static void Postfix(AbstractTimedAttackHandler __instance)
         => Plugin.LogI(
-            $"[Attack.OnInputPressed] POST | handler={__instance.GetType().Name} -- press registered");
+            $"[AbstractTimedAttackHandler] << OnInputPressed | handler={__instance.GetType().Name} -- press registered");
 }
 
 /// <summary>
@@ -67,11 +67,11 @@ static class Log_AttackHandler_CanPressInput
 {
     static void Prefix(AbstractTimedAttackHandler __instance)
         => Plugin.LogD(
-            $"[Attack.CanPressInput] PRE  | handler={__instance.GetType().Name}");
+            $"[AbstractTimedAttackHandler] >> CanPressInput | handler={__instance.GetType().Name}");
 
     static void Postfix(AbstractTimedAttackHandler __instance, bool __result)
         => Plugin.LogD(
-            $"[Attack.CanPressInput] POST | handler={__instance.GetType().Name} result={__result}");
+            $"[AbstractTimedAttackHandler] << CanPressInput | handler={__instance.GetType().Name} result={__result}");
 }
 
 
@@ -85,11 +85,11 @@ static class Log_TimedAttackHandler_GetResult
 {
     static void Prefix(TimedAttackHandler __instance, PlayerCombatMoveDefinition __0)
         => Plugin.LogI(
-            $"[TimedAttackHandler.GetResult] PRE  | move={((__0 != null) ? __0.name : "null")}");
+            $"[TimedAttackHandler] >> GetResult | move={((__0 != null) ? __0.Pointer.ToString("X") : "null")}");
 
     static void Postfix(TimedAttackHandler __instance, PlayerCombatMoveDefinition __0)
         => Plugin.LogI(
-            $"[TimedAttackHandler.GetResult] POST | move={((__0 != null) ? __0.name : "null")} -- QTE armed");
+            $"[TimedAttackHandler] << GetResult | move={((__0 != null) ? __0.Pointer.ToString("X") : "null")} -- QTE armed");
 }
 
 /// <summary>OnAttackResultReady -- fires once per-player with their individual QTE result.</summary>
@@ -98,13 +98,13 @@ static class Log_TimedAttackHandler_OnAttackResultReady
 {
     static void Prefix(TimedAttackHandler __instance, Rewired.Player __0, EQTEResult __1)
         => Plugin.LogI(
-            $"[TimedAttackHandler.OnAttackResultReady] PRE  | " +
-            $"player={(__0 != null ? __0.name : "null")} result={__1}");
+            $"[TimedAttackHandler] >> OnAttackResultReady | " +
+            $"player={(__0 != null ? __0.Pointer.ToString("X") : "null")} result={__1}");
 
     static void Postfix(TimedAttackHandler __instance, Rewired.Player __0, EQTEResult __1)
         => Plugin.LogI(
-            $"[TimedAttackHandler.OnAttackResultReady] POST | " +
-            $"player={(__0 != null ? __0.name : "null")} result={__1} -- recorded");
+            $"[TimedAttackHandler] << OnAttackResultReady | " +
+            $"player={(__0 != null ? __0.Pointer.ToString("X") : "null")} result={__1} -- recorded");
 }
 
 /// <summary>SendAttackResult (private) -- broadcasts the aggregated TeamQTEResult to the game.</summary>
@@ -212,9 +212,16 @@ static class Log_BlockHandler_GetResult
 [HarmonyPatch(typeof(AbstractTimedAttackHandler), "CanAutoTimeHit")]
 static class Log_AbstractTimedAttackHandler_CanAutoTimeHit
 {
-    static void Postfix(AbstractTimedAttackHandler __instance, bool __result)
-        => Plugin.LogD(
-            $"[CanAutoTimeHit] POST | handler={__instance.GetType().Name} result={__result}");
+    static void Postfix(AbstractTimedAttackHandler __instance, bool __result) {
+        if (__result) {
+            Plugin.LogD(
+            $"[AbstractTimedAttackHandler] << CanAutoTimeHit | handler={__instance.GetType().Name} result={__result}");
+        } else {
+            Plugin.LogW(
+            $"[AbstractTimedAttackHandler] << CanAutoTimeHit | handler={__instance.GetType().Name} result={__result}");
+        }
+        
+    }
 }
 
 /// <summary>CanAutoTime -- called by CanAutoTimeHit for each active modifier to decide auto-timing.</summary>
@@ -223,13 +230,18 @@ static class Log_AutoTimeAttackModifier_CanAutoTime
 {
     static void Prefix(AutoTimeAttackModifier __instance, PlayerCombatMoveDefinition __0)
         => Plugin.LogD(
-            $"[AutoTimeAttackModifier.CanAutoTime] PRE  | " +
-            $"chances={__instance.autoTimeChances:F2} move={((__0 != null) ? __0.name : "null")}");
+            $"[AutoTimeAttackModifier] >> CanAutoTime  | " +
+            $"chances={__instance.autoTimeChances:F2} move={((__0 != null) ? __0.Pointer.ToString("X") : "null")}");
 
-    static void Postfix(AutoTimeAttackModifier __instance, bool __result)
-        => Plugin.LogD(
-            $"[AutoTimeAttackModifier.CanAutoTime] POST | " +
-            $"chances={__instance.autoTimeChances:F2} result={__result}");
+    static void Postfix(AutoTimeAttackModifier __instance, bool __result) {
+            if (__result) {
+                Plugin.LogD(
+                $"[AutoTimeAttackModifier] << CanAutoTime | chances={__instance.autoTimeChances:F2} result={__result}");
+            } else {
+                Plugin.LogW(
+                $"[AutoTimeAttackModifier] << CanAutoTime | chances={__instance.autoTimeChances:F2} result={__result}");
+            }
+    }
 }
 
 
@@ -243,11 +255,11 @@ static class Log_AutoTimeBlockModifier_CanAutoTime
 {
     static void Prefix(AutoTimeBlockModifier __instance)
         => Plugin.LogD(
-            $"[AutoTimeBlockModifier.CanAutoTime] PRE  | chances={__instance.autoTimeChances:F2}");
+            $"[AutoTimeBlockModifier] >> CanAutoTime | chances={__instance.autoTimeChances:F2}");
 
     static void Postfix(AutoTimeBlockModifier __instance, bool __result)
         => Plugin.LogD(
-            $"[AutoTimeBlockModifier.CanAutoTime] POST | chances={__instance.autoTimeChances:F2} result={__result}");
+            $"[AutoTimeBlockModifier] << CanAutoTime | chances={__instance.autoTimeChances:F2} result={__result}");
 }
 
 
@@ -261,35 +273,40 @@ static class Log_TeamQTEResult_GetBestResult
 {
     static void Prefix(TeamQTEResult __instance)
         => Plugin.LogD(
-            $"[TeamQTEResult.GetBestResult] PRE  | qteId={__instance.QteId}");
+            $"[TeamQTEResult] >> GetBestResult | qteId={__instance.QteId}");
 
     static void Postfix(QTEResult __result)
         => Plugin.LogD(
-            $"[TeamQTEResult.GetBestResult] POST | best={__result.result}");
+            $"[TeamQTEResult] << GetBestResult | best={__result.result}");
 }
 
 /// <summary>HasSuccess -- broad success gate used by many callers before reading the result.</summary>
 [HarmonyPatch(typeof(TeamQTEResult), nameof(TeamQTEResult.HasSuccess))]
 static class Log_TeamQTEResult_HasSuccess
 {
-    static void Prefix(TeamQTEResult __instance)
+    static void Postfix(TeamQTEResult __instance, bool __result)
         => Plugin.LogD(
-            $"[TeamQTEResult.HasSuccess] PRE  | qteId={__instance.QteId}");
+            $"[TeamQTEResult] << HasSuccess | qteId={__instance.QteId} result={__result}");
 
-    // Postfix omitted -- calling other patched methods from here causes re-entrant crashes.
+    // calling other patched methods from here causes re-entrant crashes.
 }
 
 /// <summary>GetSuccessCount -- used by multi-player checks (e.g. triple-block cancel).</summary>
 [HarmonyPatch(typeof(TeamQTEResult), nameof(TeamQTEResult.GetSuccessCount))]
 static class Log_TeamQTEResult_GetSuccessCount
 {
-    static void Prefix(TeamQTEResult __instance)
-        => Plugin.LogD(
-            $"[TeamQTEResult.GetSuccessCount] PRE  | qteId={__instance.QteId}");
+    // static void Prefix(TeamQTEResult __instance)
+    //     => Plugin.LogD(
+    //         $"[TeamQTEResult] >> GetSuccessCount | qteId={__instance.QteId}");
 
-    static void Postfix(int __result)
-        => Plugin.LogD(
-            $"[TeamQTEResult.GetSuccessCount] POST | count={__result}");
+    static void Postfix(TeamQTEResult __instance, int __result)
+    {
+        if (__result > 0) {
+            Plugin.LogD(
+            $"[TeamQTEResult] << GetSuccessCount | qteId={__instance.QteId} result={__result}");
+        }
+    }
+
 }
 
 /// <summary>GetResultForPlayer -- per-player result lookup used in co-op / individual feedback.</summary>
@@ -298,8 +315,8 @@ static class Log_TeamQTEResult_GetResultForPlayer
 {
     static void Prefix(TeamQTEResult __instance, Rewired.Player __0)
         => Plugin.LogD(
-            $"[TeamQTEResult.GetResultForPlayer] PRE  | qteId={__instance.QteId} " +
-            $"player={(__0 != null ? __0.name : "null")}");
+            $"[TeamQTEResult] >> GetResultForPlayer | qteId={__instance.QteId} " +
+            $"player={(__0 != null ? __0.Pointer.ToString("X") : "null")}");
 
     // Postfix omitted -- QTEResult field access is safe but keeping symmetry with other simplifications.
 }
@@ -310,10 +327,31 @@ static class Log_TeamQTEResult_HasSuccessForPlayer
 {
     static void Prefix(TeamQTEResult __instance, Rewired.Player __0)
         => Plugin.LogD(
-            $"[TeamQTEResult.HasSuccessForPlayer] PRE  | qteId={__instance.QteId} " +
-            $"player={(__0 != null ? __0.name : "null")}");
+            $"[TeamQTEResult] >> HasSuccessForPlayer | qteId={__instance.QteId} " +
+            $"player={(__0 != null ? __0.Pointer.ToString("X") : "null")}");
+
+    static void Postfix(TeamQTEResult __instance, Rewired.Player __0, bool __result)
+        => Plugin.LogD(
+            $"[TeamQTEResult] << HasSuccessForPlayer | qteId={__instance.QteId} " +
+            $"player={(__0 != null ? __0.Pointer.ToString("X") : "null")} result={__result}");
 
     // Postfix omitted -- keeping patch symmetric with HasSuccess simplification.
+}
+
+/// <summary>AddResult -- records one player's QTE result into the team result; called once per player
+/// per accepted kick event inside PotionKick.UpdateKickForPlayer.</summary>
+[HarmonyPatch(typeof(TeamQTEResult), nameof(TeamQTEResult.AddResult))]
+static class Log_TeamQTEResult_AddResult
+{
+    static void Prefix(TeamQTEResult __instance, QTEResult __0)
+        => Plugin.LogI(
+            $"[TeamQTEResult] >> AddResult | qteId={__instance.QteId} " +
+            $"player={(__0.owner != null ? __0.owner.Pointer.ToString("X") : "null")} " +
+            $"result={__0.result}");
+
+    static void Postfix(TeamQTEResult __instance)
+        => Plugin.LogI(
+            $"[TeamQTEResult] << AddResult | qteId={__instance.QteId}");
 }
 
 
@@ -326,10 +364,10 @@ static class Log_TeamQTEResult_HasSuccessForPlayer
 static class Log_CombatDamage_ApplyBlockSuccessModifier
 {
     static void Prefix()
-        => Plugin.LogI("[CombatDamage.ApplyBlockSuccessModifier] PRE  | applying block success modifiers");
+        => Plugin.LogI("[CombatDamage] >> ApplyBlockSuccessModifier");
 
     static void Postfix()
-        => Plugin.LogI("[CombatDamage.ApplyBlockSuccessModifier] POST | done");
+        => Plugin.LogI("[CombatDamage] << ApplyBlockSuccessModifier");
 }
 
 /// <summary>ApplyBlockFailedModifiers (private) -- applies penalty damage when block failed.</summary>
@@ -349,11 +387,11 @@ static class Log_PlayerCombatActor_OnBlockInput
 {
     static void Prefix(PlayerCombatActor __instance)
         => Plugin.LogI(
-            $"[PlayerCombatActor.OnBlockInput] PRE  | actor={__instance.GetType().Name}");
+            $"[PlayerCombatActor] >> OnBlockInput | actor={__instance.GetType().Name}");
 
     static void Postfix(PlayerCombatActor __instance)
         => Plugin.LogI(
-            $"[PlayerCombatActor.OnBlockInput] POST | done");
+            $"[PlayerCombatActor] << OnBlockInput | actor={__instance.GetType().Name}");
 }
 
 /// <summary>PlayerCombatActor.GetBlockResult -- retrieves the block QTE result from the actor.</summary>
@@ -362,11 +400,11 @@ static class Log_PlayerCombatActor_GetBlockResult
 {
     static void Prefix(PlayerCombatActor __instance)
         => Plugin.LogI(
-            $"[PlayerCombatActor.GetBlockResult] PRE  | actor={__instance.GetType().Name}");
+            $"[PlayerCombatActor] >> GetBlockResult | actor={__instance.GetType().Name}");
 
     static void Postfix(TeamQTEResult __result)
         => Plugin.LogI(
-            $"[PlayerCombatActor.GetBlockResult] POST | result={((__result != null) ? "non-null" : "null")}");
+            $"[PlayerCombatActor] << GetBlockResult | result={((__result != null) ? "non-null" : "null")}");
 }
 
 /// <summary>TimedBlockFailedDamagePercentageModifier -- extra damage penalty on failed block.</summary>
@@ -375,11 +413,11 @@ static class Log_TimedBlockFailedDamage_GetModifiedDamage
 {
     static void Prefix(float __0)
         => Plugin.LogI(
-            $"[TimedBlockFailedDamage.GetModifiedDamage] PRE  | baseDamage={__0:F1} -- should not appear with mod active");
+            $"[TimedBlockFailedDamage] >> GetModifiedDamage | baseDamage={__0:F1} -- should not appear with mod active");
 
     static void Postfix(float __result)
         => Plugin.LogI(
-            $"[TimedBlockFailedDamage.GetModifiedDamage] POST | modifiedDamage={__result:F1}");
+            $"[TimedBlockFailedDamage] << GetModifiedDamage | modifiedDamage={__result:F1}");
 }
 
 /// <summary>TimedBlockAbsoluteDamageCapModifier -- caps damage on a successful block.</summary>
@@ -388,11 +426,11 @@ static class Log_TimedBlockDamageCap_GetModifiedDamage
 {
     static void Prefix(float __0)
         => Plugin.LogI(
-            $"[TimedBlockDamageCap.GetModifiedDamage] PRE  | baseDamage={__0:F1}");
+            $"[TimedBlockDamageCap] >> GetModifiedDamage | baseDamage={__0:F1}");
 
     static void Postfix(float __result)
         => Plugin.LogI(
-            $"[TimedBlockDamageCap.GetModifiedDamage] POST | modifiedDamage={__result:F1}");
+            $"[TimedBlockDamageCap] << GetModifiedDamage | modifiedDamage={__result:F1}");
 }
 
 // ──────────────────────────────────────────────────────────────────────
@@ -410,7 +448,7 @@ static class Log_TimeQTEHandler_Init
     {
         if (handlerSettings == null) { Plugin.LogD("[TimeQTEHandler.Init] handlerSettings=null"); return; }
         Plugin.LogI(
-            $"[TimeQTEHandler.Init] tooEarly={handlerSettings.TooEarlyInputWindow:F3} " +
+            $"[TimeQTEHandler] >> Init | tooEarly={handlerSettings.TooEarlyInputWindow:F3} " +
             $"beforeOK={handlerSettings.BeforeQTEOkWindow:F3} " +
             $"perfect={handlerSettings.PerfectQTEWindow:F3} " +
             $"afterOK={handlerSettings.AfterQTEOKWindow:F3} " +
@@ -422,28 +460,28 @@ static class Log_TimeQTEHandler_Init
 static class Log_TimeQTESettings_TooEarlyInputWindow
 {
     static void Postfix(float __result)
-        => Plugin.LogD($"[TimeQTESettings.TooEarlyInputWindow] -> {__result:F3}");
+        => Plugin.LogD($"[TimeQTESettings] << TooEarlyInputWindow | result={__result:F3}");
 }
 
 [HarmonyPatch(typeof(TimeQTESettings), "get_BeforeQTEOkWindow")]
 static class Log_TimeQTESettings_BeforeQTEOkWindow
 {
     static void Postfix(float __result)
-        => Plugin.LogD($"[TimeQTESettings.BeforeQTEOkWindow] -> {__result:F3}");
+        => Plugin.LogD($"[TimeQTESettings] << BeforeQTEOkWindow | result={__result:F3}");
 }
 
 [HarmonyPatch(typeof(TimeQTESettings), "get_PerfectQTEWindow")]
 static class Log_TimeQTESettings_PerfectQTEWindow
 {
     static void Postfix(float __result)
-        => Plugin.LogD($"[TimeQTESettings.PerfectQTEWindow] -> {__result:F3}");
+        => Plugin.LogD($"[TimeQTESettings] << PerfectQTEWindow | result={__result:F3}");
 }
 
 [HarmonyPatch(typeof(TimeQTESettings), "get_AfterQTEOKWindow")]
 static class Log_TimeQTESettings_AfterQTEOKWindow
 {
     static void Postfix(float __result)
-        => Plugin.LogD($"[TimeQTESettings.AfterQTEOKWindow] -> {__result:F3}");
+        => Plugin.LogD($"[TimeQTESettings] << AfterQTEOKWindow | result={__result:F3}");
 }
 
 // \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
@@ -456,11 +494,11 @@ static class Log_DeflectMoonrangState_EnableDeflect
 {
     static void Prefix(DeflectMoonrangState __instance)
         => Plugin.LogI(
-            $"[DeflectMoonrangState.EnableDeflect] PRE  | deflecting={__instance.Deflecting} deflectCount=?");
+            $"[DeflectMoonrangState] >> EnableDeflect | deflecting={__instance.Deflecting} deflectCount=?");
 
     static void Postfix(DeflectMoonrangState __instance)
         => Plugin.LogI(
-            $"[DeflectMoonrangState.EnableDeflect] POST | deflecting={__instance.Deflecting} \u2014 window open");
+            $"[DeflectMoonrangState] << EnableDeflect | deflecting={__instance.Deflecting} \u2014 window open");
 }
 
 /// <summary>DisableDeflect \u2014 the deflect window has closed.</summary>
@@ -469,11 +507,10 @@ static class Log_DeflectMoonrangState_DisableDeflect
 {
     static void Prefix(DeflectMoonrangState __instance)
         => Plugin.LogI(
-            $"[DeflectMoonrangState.DisableDeflect] PRE  | deflecting={__instance.Deflecting}");
-
+            $"[DeflectMoonrangState] >> DisableDeflect | deflecting={__instance.Deflecting}");
     static void Postfix(DeflectMoonrangState __instance)
         => Plugin.LogI(
-            $"[DeflectMoonrangState.DisableDeflect] POST | window closed");
+            $"[DeflectMoonrangState] << DisableDeflect | window closed");
 }
 
 /// <summary>
@@ -485,11 +522,11 @@ static class Log_DeflectMoonrangState_OnDeflectInput
 {
     static void Prefix(DeflectMoonrangState __instance)
         => Plugin.LogI(
-            $"[DeflectMoonrangState.OnDeflectInput] PRE  | deflecting={__instance.Deflecting}");
+            $"[DeflectMoonrangState] >> OnDeflectInput | deflecting={__instance.Deflecting}");
 
     static void Postfix(DeflectMoonrangState __instance)
         => Plugin.LogI(
-            $"[DeflectMoonrangState.OnDeflectInput] POST | deflecting={__instance.Deflecting}");
+            $"[DeflectMoonrangState] << OnDeflectInput | deflecting={__instance.Deflecting}");
 }
 
 /// <summary>
@@ -503,11 +540,11 @@ static class Log_DeflectMoonrangState_OnDeflectProjectile
 {
     static void Prefix(DeflectMoonrangState __instance)
         => Plugin.LogI(
-            $"[DeflectMoonrangState.OnDeflectProjectile] PRE  | deflecting={__instance.Deflecting}");
+            $"[DeflectMoonrangState] >> OnDeflectProjectile | deflecting={__instance.Deflecting}");
 
     static void Postfix(DeflectMoonrangState __instance)
         => Plugin.LogI(
-            $"[DeflectMoonrangState.OnDeflectProjectile] POST | deflecting={__instance.Deflecting}");
+            $"[DeflectMoonrangState] << OnDeflectProjectile | deflecting={__instance.Deflecting}");
 }
 
 /// <summary>
@@ -520,11 +557,11 @@ static class Log_DeflectMoonrangState_GetQTEResult
 {
     static void Prefix(DeflectMoonrangState __instance)
         => Plugin.LogI(
-            $"[DeflectMoonrangState.GetQTEResult] PRE  | deflecting={__instance.Deflecting}");
+            $"[DeflectMoonrangState] >> GetQTEResult | deflecting={__instance.Deflecting}");
 
     static void Postfix(DeflectMoonrangState __instance)
         => Plugin.LogI(
-            $"[DeflectMoonrangState.GetQTEResult] POST | deflecting={__instance.Deflecting}");
+            $"[DeflectMoonrangState] << GetQTEResult | deflecting={__instance.Deflecting}");
 }
 
 
@@ -543,12 +580,12 @@ static class Log_AdditionalPlayersMoonrangDeflection_OnDeflectInput
     {
         string playerName = __instance.Player != null ? __instance.Player.name : "null";
         Plugin.LogI(
-            $"[AdditionalPlayersMoonrangDeflection.OnDeflectInput] PRE  | player={playerName} deflecting={__instance.Deflecting}");
+            $"[AdditionalPlayersMoonrangDeflection] >> OnDeflectInput | player={playerName} deflecting={__instance.Deflecting}");
     }
 
     static void Postfix(AdditionalPlayersMoonrangDeflection __instance)
         => Plugin.LogI(
-            $"[AdditionalPlayersMoonrangDeflection.OnDeflectInput] POST | deflecting={__instance.Deflecting}");
+            $"[AdditionalPlayersMoonrangDeflection] << OnDeflectInput | deflecting={__instance.Deflecting}");
 }
 
 // ──────────────────────────────────────────────────────────────────────
@@ -573,9 +610,9 @@ static class Log_HitData_SetQTEResult
 {
     static void Prefix(HitData __instance, TeamQTEResult __0)
     {
-        string moveName = __instance.combatMove != null ? __instance.combatMove.name : "null";
+        string moveName = __instance.combatMove != null ? __instance.combatMove.Pointer.ToString("X") : "null";
         Plugin.LogI(
-            $"[HitData.SetQTEResult] PRE  | move={moveName} result={((__0 != null) ? "non-null" : "null")}");
+            $"[HitData] >> SetQTEResult | move={moveName} result={((__0 != null) ? "non-null" : "null")}");
     }
 }
 
@@ -590,9 +627,9 @@ static class Log_PlayerSpecialMoveHealEffect_GetInputModifier
 {
     static void Prefix(PlayerSpecialMoveHealEffect __instance, HitData __0)
     {
-        string moveName = __0?.combatMove != null ? __0.combatMove.name : "null";
+        string moveName = __0?.combatMove != null ? __0.combatMove.Pointer.ToString("X") : "null";
         Plugin.LogI(
-            $"[HealEffect.GetInputModifier] PRE  | move={moveName} " +
+            $"[PlayerSpecialMoveHealEffect] >> GetInputModifier | move={moveName} " +
             $"qteResult={((__0?.QTEResult != null) ? "non-null" : "null")} " +
             $"qteSuccessMult={__instance.qteSuccessMultiplier:F3} " +
             $"additionalBonus={__instance.additionalTimedHitQteSuccessMultiplierBonus:F3}");
@@ -600,7 +637,7 @@ static class Log_PlayerSpecialMoveHealEffect_GetInputModifier
 
     static void Postfix(float __result)
         => Plugin.LogI(
-            $"[HealEffect.GetInputModifier] POST | modifier={__result:F3}");
+            $"[PlayerSpecialMoveHealEffect] << GetInputModifier | modifier={__result:F3}");
 }
 
 /// <summary>
@@ -613,14 +650,14 @@ static class Log_PlayerSpecialMoveHealEffect_GetHealAmount
 {
     static void Prefix(HitData __0)
     {
-        string moveName = __0?.combatMove != null ? __0.combatMove.name : "null";
+        string moveName = __0?.combatMove != null ? __0.combatMove.Pointer.ToString("X") : "null";
         Plugin.LogI(
-            $"[HealEffect.GetHealAmount] PRE  | move={moveName}");
+            $"[PlayerSpecialMoveHealEffect] >> GetHealAmount | move={moveName}");
     }
 
     static void Postfix(int __result)
         => Plugin.LogI(
-            $"[HealEffect.GetHealAmount] POST | healAmount={__result}");
+            $"[PlayerSpecialMoveHealEffect] << GetHealAmount | healAmount={__result}");
 }
 
 /// <summary>
@@ -633,16 +670,16 @@ static class Log_PercentageHeal_GetHealAmount
 {
     static void Prefix(PercentageHeal __instance, HitData __0)
     {
-        string moveName = __0?.combatMove != null ? __0.combatMove.name : "null";
+        string moveName = __0?.combatMove != null ? __0.combatMove.Pointer.ToString("X") : "null";
         Plugin.LogI(
-            $"[PercentageHeal.GetHealAmount] PRE  | move={moveName} " +
+            $"[PercentageHeal] >> GetHealAmount | move={moveName} " +
             $"percentage={__instance.percentage:F3} qteSuccessMult={__instance.qteSuccessMultiplier:F3} " +
             $"qteResult={((__0?.QTEResult != null) ? "non-null" : "null")}");
     }
 
     static void Postfix(int __result)
         => Plugin.LogI(
-            $"[PercentageHeal.GetHealAmount] POST | healAmount={__result}");
+            $"[PercentageHeal] << GetHealAmount | healAmount={__result}");
 }
 
 
@@ -947,4 +984,234 @@ static class Log_PercentageHeal_GetHealAmount
 
 //     static void Postfix(SunballProjectile __instance)
 //         => Plugin.LogD($"[SunballProjectile] << SetLevel | level={__instance.Level}");
+
+
+// ──────────────────────────────────────────────────────────────────────
+// SeraiReshanComboAddCastingTimeEffect  (Arcane Barrage / ArcaneMoons combo)
+//
+// This CombatEffect adds casting time to Resh'an's timed inputs during the
+// Seraï+Resh'an team combo.
+//
+// PrepareData(HitData hitData) -- called once per hit to capture the hitData
+//   and derive the timeToAdd value from timeToAddFirstHit /
+//   timeToAddPerAdditionalHit before the hit resolves.
+//
+// OnDataReady() -- called after PrepareData; at this point dataReady==true
+//   and the effect applies the casting-time addition to the hit.
+//
+// Logging goal: confirm these methods fire during Arcane Barrage, understand
+// how many times they are called (once per hit?), and read the final timeToAdd
+// so we can decide where to inject auto-timing.
+//
+// SeraiReshanComboAddCastingTimeEffect fields:
+//   public int   timeToAddFirstHit;         // 0x48
+//   public float timeToAddPerAdditionalHit; // 0x4C
+//   private int  timeToAdd;                 // 0x50  (read via unsafe ptr below)
+// ──────────────────────────────────────────────────────────────────────
+
+/// <summary>
+/// PrepareData -- first of the two override entry-points; receives the HitData
+/// for the incoming hit.  Logs the move name, hit index flags, and the two
+/// public configuration fields so we can see what the effect is configured with.
+/// </summary>
+[HarmonyPatch(typeof(SeraiReshanComboAddCastingTimeEffect), "PrepareData")]
+static class Log_SeraiReshanCombo_PrepareData
+{
+    static void Prefix(SeraiReshanComboAddCastingTimeEffect __instance, HitData __0)
+    {
+        string moveName = __0?.combatMove != null ? __0.combatMove.Pointer.ToString("X") : "null";
+        Plugin.LogI(
+            $"[SeraiReshanCombo.PrepareData] PRE  | " +
+            $"move={moveName} " +
+            $"finalHit={(__0 != null ? __0.finalHit.ToString() : "?")} " +
+            $"damage={(__0 != null ? __0.damage.ToString() : "?")} " +
+            $"timeToAddFirstHit={__instance.timeToAddFirstHit} " +
+            $"timeToAddPerAdditionalHit={__instance.timeToAddPerAdditionalHit:F3}");
+    }
+
+    static void Postfix(SeraiReshanComboAddCastingTimeEffect __instance, HitData __0)
+    {
+        string moveName = __0?.combatMove != null ? __0.combatMove.Pointer.ToString("X") : "null";
+        Plugin.LogI(
+            $"[SeraiReshanCombo.PrepareData] POST | move={moveName} -- data prepared");
+    }
+}
+
+/// <summary>
+/// OnDataReady -- fires after PrepareData; the effect is about to be applied.
+/// Reads the private timeToAdd field (offset 0x50) via unsafe pointer to see
+/// what value was computed from the hit count.
+/// </summary>
+[HarmonyPatch(typeof(SeraiReshanComboAddCastingTimeEffect), "OnDataReady")]
+static class Log_SeraiReshanCombo_OnDataReady
+{
+    static unsafe void Prefix(SeraiReshanComboAddCastingTimeEffect __instance)
+    {
+        int timeToAdd = *(int*)((byte*)__instance.Pointer + 0x50);
+        Plugin.LogI(
+            $"[SeraiReshanCombo.OnDataReady] PRE  | " +
+            $"timeToAddFirstHit={__instance.timeToAddFirstHit} " +
+            $"timeToAddPerAdditionalHit={__instance.timeToAddPerAdditionalHit:F3} " +
+            $"timeToAdd(0x50)={timeToAdd}");
+    }
+
+    static unsafe void Postfix(SeraiReshanComboAddCastingTimeEffect __instance)
+    {
+        int timeToAdd = *(int*)((byte*)__instance.Pointer + 0x50);
+        Plugin.LogI(
+            $"[SeraiReshanCombo.OnDataReady] POST | " +
+            $"timeToAdd(0x50)={timeToAdd} -- effect applied");
+    }
+}
+
+
+// ──────────────────────────────────────────────────────────────────────
+// HitData  (additional accessors)
+// ──────────────────────────────────────────────────────────────────────
+
+/// WARNING: this is called extremely frequently, including out of combat
+// [HarmonyPatch(typeof(HitData), "get_QTEResult")]
+// static class Log_HitData_GetQTEResult
+// {
+//     static void Prefix(HitData __instance)
+//     {
+//         Plugin.LogD(
+//             $"[HitData] >> get_QTEResult | data={__instance}");
+//     }
+
+//     static void Postfix(TeamQTEResult __result)
+//         => Plugin.LogD(
+//             $"[HitData] << get_QTEResult | result={__result}");
+// }
+
+
+// ──────────────────────────────────────────────────────────────────────
+// MultiHitHandler.HitTarget  (all three overloads)
+//
+// Overload 1: HitTarget(CombatActor attacker, CombatTarget target, TeamQTEResult qteResult)
+//   -- top-level entry point used by moves that supply a QTE result directly.
+// Overload 2: HitTarget(HitData hitData)
+//   -- public single-argument form; wraps private overload with poolHitData=false.
+// Overload 3: HitTarget(HitData hitData, bool poolHitData)
+//   -- private; where the actual dispatch happens.
+// ──────────────────────────────────────────────────────────────────────
+
+/// <summary>HitTarget(CombatActor, CombatTarget, TeamQTEResult) -- top-level QTE overload.</summary>
+[HarmonyPatch(typeof(MultiHitHandler), "HitTarget",
+    new System.Type[] { typeof(CombatActor), typeof(CombatTarget), typeof(TeamQTEResult) })]
+static class Log_MultiHitHandler_HitTarget_QTE
+{
+    static void Prefix(CombatActor __0, CombatTarget __1, TeamQTEResult __2)
+        => Plugin.LogI(
+            $"[MultiHitHandler] >> HitTarget(attacker, target, qte) | " +
+            $"actor={__0} " +
+            $"target={__1} " +
+            $"qte={__2}");
+
+    static void Postfix()
+        => Plugin.LogI("[MultiHitHandler] << HitTarget(attacker, target, qte)");
+}
+
+/// <summary>HitTarget(HitData) -- public single-HitData overload.</summary>
+[HarmonyPatch(typeof(MultiHitHandler), "HitTarget",
+    new System.Type[] { typeof(HitData) })]
+static class Log_MultiHitHandler_HitTarget_HitData
+{
+    static void Prefix(HitData __0)
+    {
+        Plugin.LogI(
+            $"[MultiHitHandler] >> HitTarget(hitData) | data={__0}");
+    }
+
+    static void Postfix()
+        => Plugin.LogI("[MultiHitHandler] << HitTarget(hitData)");
+}
+
+/// <summary>HitTarget(HitData, bool) -- private core overload; poolHitData controls HitData lifetime.</summary>
+[HarmonyPatch(typeof(MultiHitHandler), "HitTarget",
+    new System.Type[] { typeof(HitData), typeof(bool) })]
+static class Log_MultiHitHandler_HitTarget_HitData_Pool
+{
+    static void Prefix(HitData __0, bool __1)
+    {
+        Plugin.LogI(
+            $"[MultiHitHandler] >> HitTarget(hitData, poolHitData) | data={__0} " +
+            $"pool={__1}");
+    }
+
+    static void Postfix()
+        => Plugin.LogI("[MultiHitHandler] << HitTarget(hitData, poolHitData)");
+}
+
+
+// ──────────────────────────────────────────────────────────────────────
+// SinglePlayerPlusAttack  (co-op secondary attacker QTE handler)
+// ──────────────────────────────────────────────────────────────────────
+
+/// WARNING: this gets called 12-13 thousand times per second, starting at game startup
+// [HarmonyPatch(typeof(SinglePlayerPlusAttack), "OnAttackResultReady")]
+// static class Log_SinglePlayerPlusAttack_OnAttackResultReady
+// {
+//     private static double _lastLogTime = -1.0;
+//     private static int _skipped = 0;
+
+//     static void Prefix(Rewired.Player __0, EQTEResult __1)
+//     {
+//         double now = UnityEngine.Time.timeAsDouble;
+//         if (now - _lastLogTime < 1.0) { _skipped++; return; }
+//         int skipped = _skipped;
+//         _skipped = 0;
+//         _lastLogTime = now;
+//         Plugin.LogD(
+//             $"[SinglePlayerPlusAttack] >> OnAttackResultReady | " +
+//             $"player={(__0 != null ? __0.Pointer.ToString("X") : "null")} result={__1} " +
+//             $"(+{skipped} since last log)");
+//     }
+// }
+
+/// <summary>OnSelfAttackResultReady -- fires when the local player's own result is ready.</summary>
+[HarmonyPatch(typeof(SinglePlayerPlusAttack), "OnSelfAttackResultReady")]
+static class Log_SinglePlayerPlusAttack_OnSelfAttackResultReady
+{
+    static void Prefix(EQTEResult __0)
+        => Plugin.LogI(
+            $"[SinglePlayerPlusAttack] >> OnSelfAttackResultReady | result={__0}");
+
+    static void Postfix(EQTEResult __0)
+        => Plugin.LogI(
+            $"[SinglePlayerPlusAttack] << OnSelfAttackResultReady | result={__0}");
+}
+
+[HarmonyPatch(typeof(InputCategory), "GetButton")]
+static class Log_InputCategory_GetButton
+{
+    static void Postfix(InputCategory __instance, string button, ref bool __result)
+    {
+        if (__result) {
+            Plugin.LogD($"[InputCategory] << GetButton |category={__instance} button={button} result={__result}");
+        }
+    }
+}
+
+// ──────────────────────────────────────────────────────────────────────
+// PlayerCombatMove.ShowInstructions  (instruction text display coroutine)
+// ──────────────────────────────────────────────────────────────────────
+
+/// <summary>
+/// ShowInstructions -- protected coroutine on PlayerCombatMove; starts the
+/// instruction-text typewriter display before a combo QTE begins.
+/// Patch fires when the coroutine object is created (i.e. at StartCoroutine
+/// call time), not once per MoveNext tick.
+/// </summary>
+[HarmonyPatch(typeof(PlayerCombatMove), "ShowInstructions")]
+static class Log_PlayerCombatMove_ShowInstructions
+{
+    static void Prefix(PlayerCombatMove __instance)
+        => Plugin.LogI(
+            $"[PlayerCombatMove] >> ShowInstructions | move={__instance.GetType().Name}");
+
+    static void Postfix(PlayerCombatMove __instance)
+        => Plugin.LogI(
+            $"[PlayerCombatMove] << ShowInstructions | move={__instance.GetType().Name} -- coroutine created");
+}
 // }
