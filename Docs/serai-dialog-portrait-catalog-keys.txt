@@ -1,0 +1,38 @@
+# Serai dialog-portrait keys from Addressables catalog
+# Source: SeaOfStars_Data/StreamingAssets/aa/catalog.json
+# Extracted: 2026-03-12
+
+# ── DEFAULT variant (12 keys) ─────────────────────────────────────────────────
+dialog-portrait-Serai
+dialog-portrait-Serai-action
+dialog-portrait-Serai-Determined
+dialog-portrait-Serai-Disappointed
+dialog-portrait-Serai-Happy
+dialog-portrait-Serai-LookingSide
+dialog-portrait-Serai-Neutral
+dialog-portrait-Serai-OverShoulderLook
+dialog-portrait-Serai-Sad
+dialog-portrait-Serai-Shocked
+dialog-portrait-Serai-Surprised
+dialog-portrait-Serai-unmasked
+
+# ── ROBOT variant (11 keys) ───────────────────────────────────────────────────
+dialog-portrait-Serai-Robot-Default
+dialog-portrait-Serai-Robot-Determined
+dialog-portrait-Serai-Robot-Disappointed
+dialog-portrait-Serai-Robot-GoldenPelican
+dialog-portrait-Serai-Robot-Happy
+dialog-portrait-Serai-Robot-Moved
+dialog-portrait-Serai-Robot-Neutral
+dialog-portrait-Serai-Robot-Neutral2
+dialog-portrait-Serai-Robot-Sad
+dialog-portrait-Serai-Robot-Shocked
+dialog-portrait-Serai-Robot-Surprised
+
+# ── Notes ─────────────────────────────────────────────────────────────────────
+# - DEFAULT expressions do NOT use a "-Default-" qualifier; they are just "-Serai-Expression".
+# - "dialog-portrait-Serai-Default-Determined" does not exist in the catalog.
+# - ROBOT keys all contain the literal substring "Robot" — reliable for detection.
+# - DEFAULT keys never contain "Robot" — no false-positives with serai+robot substring match.
+# - Matching rule in mod: name.Contains("serai", OrdinalIgnoreCase) && name.Contains("robot", OrdinalIgnoreCase)
+#   covers all 11 ROBOT keys including ones not yet loaded at startup.
