@@ -1,6 +1,6 @@
 using HarmonyLib;
 
-namespace PerfectTimingPotionKick.Patches;
+namespace PerfectTimingArcaneBarrage.Patches;
 
 // =============================================================================
 //  LOGGING PATCHES — PotionKick combo
@@ -197,41 +197,4 @@ static class Log_SPPPlayerPotionKickState_StateEnter
     static void Postfix(SPPPlayerPotionKickState __instance)
         => Plugin.LogI(
             $"[SPPPlayerPotionKickState] << StateEnter | this={__instance.Pointer:X}");
-}
-
-/// <summary>StateExecute — per-frame tick while kick window is active. High frequency → Debug.</summary>
-[HarmonyPatch(typeof(SPPPlayerPotionKickState), nameof(SPPPlayerPotionKickState.StateExecute))]
-static class Log_SPPPlayerPotionKickState_StateExecute
-{
-    static void Prefix(SPPPlayerPotionKickState __instance)
-        => Plugin.LogD(
-            $"[SPPPlayerPotionKickState] >> StateExecute | this={__instance.Pointer:X}");
-}
-
-/// <summary>OnKickInput — second player accepted a kick input.</summary>
-[HarmonyPatch(typeof(SPPPlayerPotionKickState), nameof(SPPPlayerPotionKickState.OnKickInput))]
-static class Log_SPPPlayerPotionKickState_OnKickInput
-{
-    static void Prefix(SPPPlayerPotionKickState __instance)
-        => Plugin.LogI(
-            $"[SPPPlayerPotionKickState] >> OnKickInput | this={__instance.Pointer:X} " +
-            $"kickWindowDuration={__instance.kickWindowDuration:F3} " +
-            $"kickCooldown={__instance.kickCooldown:F3}");
-
-    static void Postfix(SPPPlayerPotionKickState __instance)
-        => Plugin.LogI(
-            $"[SPPPlayerPotionKickState] << OnKickInput | this={__instance.Pointer:X}");
-}
-
-/// <summary>StateExit — kick window closed for the second player.</summary>
-[HarmonyPatch(typeof(SPPPlayerPotionKickState), nameof(SPPPlayerPotionKickState.StateExit))]
-static class Log_SPPPlayerPotionKickState_StateExit
-{
-    static void Prefix(SPPPlayerPotionKickState __instance)
-        => Plugin.LogI(
-            $"[SPPPlayerPotionKickState] >> StateExit | this={__instance.Pointer:X}");
-
-    static void Postfix(SPPPlayerPotionKickState __instance)
-        => Plugin.LogI(
-            $"[SPPPlayerPotionKickState] << StateExit | this={__instance.Pointer:X}");
 }

@@ -1,7 +1,7 @@
 using System;
 using HarmonyLib;
 
-namespace TimedHitMod.Patches;
+namespace PerfectTimingSunball.Patches;
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Soonrang Sunball auto-QTE patches
@@ -151,15 +151,7 @@ static class Patch_SunboyQTE_GetButton
             SunballState.Current = SunballState.Phase.Inactive;
             Plugin.LogD($"[InputCategory] >> GetButton | Phase.Inactive");
         }
-            
+
         return false;
     }
-
-    // static void Postfix(InputCategory __instance, string button, bool __result)
-    // {
-    //     if (SunballState.Current == SunballState.Phase.Inactive) return;
-    //     if (button != SunballState.ButtonName) return;
-    //     Plugin.LogD($"[InputCategory] << GetButton ({button}) -> {__result}");
-    // }
 }
-

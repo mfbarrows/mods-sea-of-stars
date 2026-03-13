@@ -4,7 +4,7 @@ using BepInEx.Unity.IL2CPP;
 using HarmonyLib;
 using System;
 
-namespace PerfectTimingPotionKick;
+namespace PerfectTimingArcaneBarrage;
 
 [BepInPlugin(MyPluginInfo.PLUGIN_GUID, MyPluginInfo.PLUGIN_NAME, MyPluginInfo.PLUGIN_VERSION)]
 public class Plugin : BasePlugin
@@ -12,8 +12,6 @@ public class Plugin : BasePlugin
     internal static new ManualLogSource Log = null!;
 
     private Harmony _harmony = null!;
-
-
 
     internal static void LogD(string msg) => Log.LogDebug($"[{DateTime.Now:HH:mm:ss.fff}] {msg}");
     internal static void LogI(string msg) => Log.LogInfo($"[{DateTime.Now:HH:mm:ss.fff}] {msg}");

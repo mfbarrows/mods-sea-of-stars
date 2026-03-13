@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using HarmonyLib;
 using UnityEngine;
 
-namespace PerfectTimingPotionKick.Patches;
+namespace PerfectTimingArcaneBarrage.Patches;
 
 // =============================================================================
 //  AUTO-TIME PATCHES — PotionKick combo

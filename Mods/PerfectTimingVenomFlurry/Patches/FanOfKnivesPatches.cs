@@ -1,7 +1,7 @@
 using System;
 using HarmonyLib;
 
-namespace TimedHitMod.Patches;
+namespace PerfectTimingVenomFlurry.Patches;
 
 // ─────────────────────────────────────────────────────────────────────────────
 // FanOfKnives auto-time patches
@@ -51,7 +51,7 @@ static class Patch_SeraiFanOfKnives_DoMove
         __instance.GetLocksDamageTypes(FanOfKnivesCycleFlag.MoveDamageTypes);
 
         // Clear pending set from any previous move.
-        LockTracker.EnemiesPendingFanOfKnivesHit.Clear();
+        LockTracker.EnemiesPendingHit.Clear();
 
         Plugin.LogI(
             $"[FanOfKnives.DoMove] PRE  | ThrowCount reset, " +
@@ -82,7 +82,7 @@ static class Patch_SeraiFanOfKnives_RefillAvailableTargetsLeft
                 // Seed the pending set only on the very first refill (move just started).
                 if (FanOfKnivesCycleFlag.ThrowCount == 0)
                 {
-                    LockTracker.InitAllTargets(list, LockTracker.EnemiesPendingFanOfKnivesHit);
+                    LockTracker.InitAllTargets(list, LockTracker.EnemiesPendingHit);
                     FanOfKnivesCycleFlag.TargetCount = list.Count;
                 }
             }
@@ -109,9 +109,9 @@ static class Patch_CanAutoTimeHit_FanOfKnives
     static void Postfix(PlayerCombatMoveDefinition moveDefinition, ref bool __result)
     {
         if (moveDefinition == null || !moveDefinition.name.Contains("FanOfKnives"))
-            return; // other moves handled by Patch_CanAutoTimeHit in AutoTimeAttackPatches.cs
+            return; // other moves handled by PerfectTimingAttack
 
-        int throws  = FanOfKnivesCycleFlag.ThrowCount;
+        int throws = FanOfKnivesCycleFlag.ThrowCount;
 
         // Safety cap — should never be reached in normal play.
         if (throws >= 20)
@@ -122,7 +122,7 @@ static class Patch_CanAutoTimeHit_FanOfKnives
             return;
         }
 
-        int pending = LockTracker.EnemiesPendingFanOfKnivesHit.Count;
+        int pending = LockTracker.EnemiesPendingHit.Count;
 
         // No enemies left in the pending set.
         if (pending == 0)

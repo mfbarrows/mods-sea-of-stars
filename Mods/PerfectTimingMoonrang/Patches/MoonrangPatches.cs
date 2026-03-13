@@ -1,16 +1,16 @@
 using System;
 using HarmonyLib;
 
-namespace TimedHitMod.Patches;
+namespace PerfectTimingMoonrang.Patches;
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Moonrang deflect auto-time patches
 //
 // Strategy: prefix DeflectMoonrangState.GetQTEResult() and call
-// OnDeflectProjectile() before grading runs while EnemiesPendingMoonrangHit
+// OnDeflectProjectile() before grading runs while LockTracker.EnemiesPendingHit
 // is non-empty.
 //
-// LockTracker maintains EnemiesPendingMoonrangHit:
+// LockTracker maintains EnemiesPendingHit:
 //   Init  – all enemies added at move start (RefillAvailableTargetsLeft, first call).
 //   Hit   – enemy removed via HitData.SetQTEResult patch (LockTrackingPatches).
 //   Locks – OnLocksChanged re-adds enemy if they still have matching locks.
@@ -39,7 +39,7 @@ static class MoonrangCycleFlag
         MoveDamageTypes = new Il2CppSystem.Collections.Generic.List<EDamageType>();
         instance.GetLocksDamageTypes(MoveDamageTypes);
 
-        LockTracker.EnemiesPendingMoonrangHit.Clear();
+        LockTracker.EnemiesPendingHit.Clear();
 
         Plugin.LogI(
             $"[{tag}.ThrowMoonrang] PRE  | DeflectCount reset, " +
@@ -75,7 +75,7 @@ static class Patch_Soonrang_ThrowMoonrang
 /// <summary>
 /// After RefillAvailableTargetsLeft, read availableTargets (private field at
 /// offset 0x118 on MoonrangProjectile) to get the true enemy count.
-/// This fires on initial setup and on each cycle wrap; TargetCount is stable
+/// This fires on initial setup and on each cycle wrap; TargetCount is stable.
 /// Subsequent refills are the Moonrang cycling back; don't reset the set.
 /// </summary>
 [HarmonyPatch(typeof(MoonrangProjectile), "RefillAvailableTargetsLeft")]
@@ -100,7 +100,7 @@ static class Patch_MoonrangProjectile_RefillAvailableTargetsLeft
             // Seed the pending set only on the very first refill (move just started).
             if (MoonrangCycleFlag.DeflectCount == 0)
             {
-                LockTracker.InitAllTargets(list, LockTracker.EnemiesPendingMoonrangHit);
+                LockTracker.InitAllTargets(list, LockTracker.EnemiesPendingHit);
                 MoonrangCycleFlag.TargetCount = list.Count;
             }
         }
@@ -114,7 +114,7 @@ static class Patch_MoonrangProjectile_RefillAvailableTargetsLeft
 
 /// <summary>
 /// Prefix DeflectMoonrangState.GetQTEResult. Grants a deflect while
-/// EnemiesPendingMoonrangHit is non-empty; does nothing (natural miss) when empty.
+/// LockTracker.EnemiesPendingHit is non-empty; does nothing (natural miss) when empty.
 /// Signature: public void GetQTEResult(TeamQTEResult teamQTEResult)
 /// </summary>
 [HarmonyPatch(typeof(DeflectMoonrangState), nameof(DeflectMoonrangState.GetQTEResult))]
@@ -132,7 +132,7 @@ static class Patch_DeflectMoonrangState_GetQTEResult
             return;
         }
 
-        int pending = LockTracker.EnemiesPendingMoonrangHit.Count;
+        int pending = LockTracker.EnemiesPendingHit.Count;
 
         // No enemies left in the pending set.
         if (pending == 0)

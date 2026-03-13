@@ -1,6 +1,6 @@
 using HarmonyLib;
 
-namespace TimedHitMod.Patches;
+namespace PerfectTimingBlock.Patches;
 
 // ─────────────────────────────────────────────────────────────────────────────
 // SinglePlayerPlusBlock patches

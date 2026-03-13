@@ -4,8 +4,8 @@
     <TargetFramework>net6.0</TargetFramework>
     <Nullable>enable</Nullable>
     <LangVersion>latest</LangVersion>
-    <AssemblyName>PerfectTimingPotionKick</AssemblyName>
-    <RootNamespace>PerfectTimingPotionKick</RootNamespace>
+    <AssemblyName>PerfectTimingVenomFlurry</AssemblyName>
+    <RootNamespace>PerfectTimingVenomFlurry</RootNamespace>
 
     <GameInstallPath Condition="'$(GameInstallPath)' == ''">C:\Program Files (x86)\Steam\steamapps\common\Sea of Stars</GameInstallPath>
     <BepInExCorePath>$(GameInstallPath)\BepInEx\core</BepInExCorePath>
@@ -24,7 +24,6 @@
     <Message Text="Copied $(AssemblyName).dll → $(PluginsPath)" Importance="high" />
   </Target>
 
-  <!-- BepInEx 6 core assemblies -->
   <ItemGroup>
     <Reference Include="BepInEx.Core">
       <HintPath>$(BepInExCorePath)\BepInEx.Core.dll</HintPath>
@@ -52,7 +51,6 @@
     </Reference>
   </ItemGroup>
 
-  <!-- Game interop assemblies -->
   <ItemGroup>
     <Reference Include="Assembly-CSharp">
       <HintPath>$(GameInteropPath)\Assembly-CSharp.dll</HintPath>

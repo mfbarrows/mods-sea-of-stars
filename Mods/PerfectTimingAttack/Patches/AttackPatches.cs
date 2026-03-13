@@ -1,6 +1,6 @@
 using HarmonyLib;
 
-namespace TimedHitMod.Patches;
+namespace PerfectTimingAttack.Patches;
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Attack auto-time patches
@@ -12,8 +12,8 @@ namespace TimedHitMod.Patches;
 
 /// <summary>
 /// Force AbstractTimedAttackHandler.CanAutoTimeHit to always return true.
-/// FanOfKnives is excluded here — its own conditional logic lives in
-/// Patch_CanAutoTimeHit_FanOfKnives (AutoTimeFanOfKnivesPatches.cs).
+/// FanOfKnives is excluded here — PerfectTimingVenomFlurry handles its own
+/// count-bounded auto-time logic for that move.
 /// Signature: protected bool CanAutoTimeHit(PlayerCombatMoveDefinition moveDefinition)
 /// </summary>
 [HarmonyPatch(typeof(AbstractTimedAttackHandler), "CanAutoTimeHit")]
@@ -22,7 +22,7 @@ static class Patch_CanAutoTimeHit
     static void Postfix(PlayerCombatMoveDefinition moveDefinition, ref bool __result)
     {
         if (moveDefinition != null && moveDefinition.name.Contains("FanOfKnives"))
-            return; // handled by Patch_CanAutoTimeHit_FanOfKnives
+            return; // handled by PerfectTimingVenomFlurry
         __result = true;
     }
 }

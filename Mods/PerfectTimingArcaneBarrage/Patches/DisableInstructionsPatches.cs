@@ -1,6 +1,6 @@
 using HarmonyLib;
 
-namespace PerfectTimingPotionKick.Patches;
+namespace PerfectTimingArcaneBarrage.Patches;
 
 /// <summary>
 /// Skip the instruction text + confirm-input wait for PotionKick.

@@ -2,40 +2,31 @@ using System;
 using System.Collections.Generic;
 using HarmonyLib;
 
-namespace TimedHitMod.Patches;
+namespace PerfectTimingVenomFlurry.Patches;
 
 // ─────────────────────────────────────────────────────────────────────────────
-// LockTracker  –  "set of enemies pending a hit" approach
-//
-// For both Moonrang and FanOfKnives we maintain a HashSet<IntPtr>:
-//   EnemiesPendingMoonrangHit / EnemiesPendingFanOfKnivesHit
+// LockTracker  –  "set of enemies pending a FanOfKnives hit" approach
 //
 // Lifecycle
 //   Init  (move start, first RefillAvailableTargetsLeft):
 //     Add ALL enemies in the target list, regardless of locks.
 //
-//   Hit landed (HitData.SetQTEResult, filtered by move name):
+//   Hit landed (HitData.SetQTEResult, filtered to SeraiFanOfKnives moves):
 //     Remove the hit enemy from the set.
 //     OnLocksChanged fires immediately after if a lock broke.
 //
 //   OnLocksChanged (lock state changed on an enemy):
-//     If the enemy still has matching locks → re-add to the set
-//     (they need another hit to break the remaining lock).
+//     If the enemy still has FanOfKnives-matching locks → re-add to the set.
 //     If no matching locks remain → leave them removed.
 //
-//   Grant auto-time / deflect:
+//   Grant auto-time:
 //     While the set is non-empty.
-//     Force stop (result = false / return) when empty.
-//
-// This naturally covers both the initial "hit every enemy once" pass and the
-// "keep hitting enemies that still have locks" extension, without any separate
-// counter-based limit or WaitingForLockBreak gate.
+//     Force stop (result = false) when empty.
 // ─────────────────────────────────────────────────────────────────────────────
 
 static class LockTracker
 {
-    internal static readonly HashSet<IntPtr> EnemiesPendingMoonrangHit    = new();
-    internal static readonly HashSet<IntPtr> EnemiesPendingFanOfKnivesHit = new();
+    internal static readonly HashSet<IntPtr> EnemiesPendingHit = new();
 
     // ── Helpers ──────────────────────────────────────────────────────────────
 
@@ -92,35 +83,19 @@ static class LockTracker
     // ── Per-hit update (called from HitData.SetQTEResult) ────────────────────
 
     /// <summary>
-    /// Remove the hit enemy from the appropriate pending set.
+    /// Remove the hit enemy from EnemiesPendingHit.
     /// OnLocksChanged will re-add them if they still have matching locks.
     /// </summary>
-    internal static void OnHitApplied(HitData hitData, string moveName)
+    internal static void OnHitApplied(HitData hitData)
     {
         try
         {
             var enemy = hitData.target?.owner?.TryCast<EnemyCombatActor>();
             if (enemy == null) return;
             IntPtr ptr = enemy.Pointer;
-
-            if (moveName.Contains("Moonrang"))
-            {
-                EnemiesPendingMoonrangHit.Remove(ptr);
-                Plugin.LogI(
-                    $"[LockTracker] Moonrang hit 0x{ptr:X} → removed (pending={EnemiesPendingMoonrangHit.Count})");
-            }
-            else if (moveName.Contains("Soonrang"))
-            {
-                EnemiesPendingMoonrangHit.Remove(ptr);
-                Plugin.LogI(
-                    $"[LockTracker] Soonrang hit 0x{ptr:X} → removed (pending={EnemiesPendingMoonrangHit.Count})");
-            }
-            else if (moveName.Contains("SeraiFanOfKnives"))
-            {
-                EnemiesPendingFanOfKnivesHit.Remove(ptr);
-                Plugin.LogI(
-                    $"[LockTracker] FanOfKnives hit 0x{ptr:X} → removed (pending={EnemiesPendingFanOfKnivesHit.Count})");
-            }
+            EnemiesPendingHit.Remove(ptr);
+            Plugin.LogI(
+                $"[LockTracker] FanOfKnives hit 0x{ptr:X} → removed (pending={EnemiesPendingHit.Count})");
         }
         catch (Exception ex)
         {
@@ -131,26 +106,22 @@ static class LockTracker
     // ── Per-lock-change update (called from OnLocksChanged) ──────────────────
 
     /// <summary>
-    /// Re-adds the enemy if they still have matching locks — meaning they need
-    /// another hit. If no locks remain they are already gone from the set and
-    /// stay gone.
+    /// Re-adds the enemy if they still have matching FanOfKnives locks — meaning
+    /// they need another hit. If no locks remain they are already gone from the
+    /// set and stay gone.
     /// </summary>
     internal static void UpdateForEnemy(EnemyCombatActor enemy)
     {
         try
         {
             IntPtr ptr = enemy.Pointer;
-            bool hasMoonrangLocks    = EnemyHasMatchingLocks(enemy, MoonrangCycleFlag.MoveDamageTypes);
-            bool hasFokLocks         = EnemyHasMatchingLocks(enemy, FanOfKnivesCycleFlag.MoveDamageTypes);
+            bool hasLocks = EnemyHasMatchingLocks(enemy, FanOfKnivesCycleFlag.MoveDamageTypes);
 
-            if (hasMoonrangLocks)    EnemiesPendingMoonrangHit.Add(ptr);
-            if (hasFokLocks)         EnemiesPendingFanOfKnivesHit.Add(ptr);
+            if (hasLocks) EnemiesPendingHit.Add(ptr);
 
             Plugin.LogI(
                 $"[LockTracker] OnLocksChanged 0x{ptr:X}: " +
-                $"moonrangLocks={hasMoonrangLocks} fokLocks={hasFokLocks} | " +
-                $"MoonPending={EnemiesPendingMoonrangHit.Count} " +
-                $"FokPending={EnemiesPendingFanOfKnivesHit.Count}");
+                $"fokLocks={hasLocks} | pending={EnemiesPendingHit.Count}");
         }
         catch (Exception ex)
         {
@@ -163,7 +134,7 @@ static class LockTracker
 
 /// <summary>
 /// Fires after the engine updates an enemy's spell locks.
-/// Re-adds the enemy to the pending sets if they still have matching locks.
+/// Re-adds the enemy to EnemiesPendingHit if they still have matching FanOfKnives locks.
 /// </summary>
 [HarmonyPatch(typeof(EnemyCombatActor), nameof(EnemyCombatActor.OnLocksChanged))]
 static class Patch_EnemyCombatActor_OnLocksChanged
@@ -174,8 +145,8 @@ static class Patch_EnemyCombatActor_OnLocksChanged
 
 /// <summary>
 /// Fires when a hit is applied to a target with a QTE result attached.
-/// Removes the hit enemy from the appropriate pending set; OnLocksChanged
-/// will re-add them if they still have locks remaining.
+/// Removes the hit enemy from EnemiesPendingHit (FanOfKnives moves only).
+/// OnLocksChanged will re-add them if they still have locks remaining.
 /// </summary>
 [HarmonyPatch(typeof(HitData), nameof(HitData.SetQTEResult))]
 static class Patch_HitData_SetQTEResult_LockTracking
@@ -184,7 +155,7 @@ static class Patch_HitData_SetQTEResult_LockTracking
     {
         if (__instance.combatMove == null) return;
         string name = __instance.combatMove.name;
-        if (name.Contains("Moonrang") || name.Contains("Soonrang") || name.Contains("FanOfKnives"))
-            LockTracker.OnHitApplied(__instance, name);
+        if (name.Contains("FanOfKnives"))
+            LockTracker.OnHitApplied(__instance);
     }
 }

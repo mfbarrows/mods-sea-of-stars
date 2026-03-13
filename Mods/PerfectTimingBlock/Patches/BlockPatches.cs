@@ -1,6 +1,6 @@
 using HarmonyLib;
 
-namespace TimedHitMod.Patches;
+namespace PerfectTimingBlock.Patches;
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Block auto-time patches
@@ -45,13 +45,3 @@ static class Patch_AutoTimeBlockModifier_CanAutoTime
         __result = true;
     }
 }
-
-// GetInputDown patch disabled — GetResult prefix is cleaner and fires once.
-// Kept here for reference if needed.
-//
-// [HarmonyPatch(typeof(TimedBlockHandler), "GetInputDown")]
-// static class Patch_TimedBlockHandler_GetInputDown
-// {
-//     static void Postfix(ref bool __result) { __result = true; }
-// }
-
