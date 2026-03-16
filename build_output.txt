@@ -1,0 +1,11 @@
+MSBuild version 17.9.6+a4ecab324 for .NET
+  Determining projects to restore...
+  Restored c:\Users\pfayz\Documents\mods-sea-of-stars\Mods\SeraiDefaultSkin\SeraiDefaultSkin.csproj (in 51 ms).
+  SeraiDefaultSkin -> c:\Users\pfayz\Documents\mods-sea-of-stars\Mods\SeraiDefaultSkin\bin\Release\net6.0\SeraiDefaultSkin.dll
+  Copied SeraiDefaultSkin.dll → C:\Program Files (x86)\Steam\steamapps\common\Sea of Stars\BepInEx\plugins
+
+Build succeeded.
+    0 Warning(s)
+    0 Error(s)
+
+Time Elapsed 00:00:00.69

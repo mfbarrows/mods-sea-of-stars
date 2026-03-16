@@ -4,8 +4,8 @@
     <TargetFramework>net6.0</TargetFramework>
     <Nullable>enable</Nullable>
     <LangVersion>latest</LangVersion>
-    <AssemblyName>SeraiDefaultSkin</AssemblyName>
-    <RootNamespace>SeraiDefaultSkin</RootNamespace>
+    <AssemblyName>PerfectTimingLeapFrog</AssemblyName>
+    <RootNamespace>PerfectTimingLeapFrog</RootNamespace>
 
     <GameInstallPath Condition="'$(GameInstallPath)' == ''">C:\Program Files (x86)\Steam\steamapps\common\Sea of Stars</GameInstallPath>
     <BepInExCorePath>$(GameInstallPath)\BepInEx\core</BepInExCorePath>
@@ -19,9 +19,9 @@
 
   <Target Name="CopyToPlugins" AfterTargets="Build">
     <Copy SourceFiles="$(OutputPath)$(AssemblyName).dll"
-          DestinationFolder="$(PluginsPath)\$(AssemblyName)"
+          DestinationFolder="$(PluginsPath)"
           OverwriteReadOnlyFiles="true" />
-    <Message Text="Copied $(AssemblyName).dll → $(PluginsPath)\$(AssemblyName)" Importance="high" />
+    <Message Text="Copied $(AssemblyName).dll → $(PluginsPath)" Importance="high" />
   </Target>
 
   <ItemGroup>
@@ -65,11 +65,6 @@
       <HintPath>$(GameInteropPath)\UnityEngine.CoreModule.dll</HintPath>
       <Private>false</Private>
     </Reference>
-    <Reference Include="UnityEngine.AnimationModule"
-               Condition="Exists('$(GameInteropPath)\UnityEngine.AnimationModule.dll')">
-      <HintPath>$(GameInteropPath)\UnityEngine.AnimationModule.dll</HintPath>
-      <Private>false</Private>
-    </Reference>
     <Reference Include="Il2Cppmscorlib">
       <HintPath>$(GameInteropPath)\Il2Cppmscorlib.dll</HintPath>
       <Private>false</Private>
@@ -84,25 +79,6 @@
     </Reference>
     <Reference Include="Sabotage.Core">
       <HintPath>$(GameInteropPath)\Sabotage.Core.dll</HintPath>
-      <Private>false</Private>
-    </Reference>
-    <Reference Include="Unity.Addressables"
-               Condition="Exists('$(GameInteropPath)\Unity.Addressables.dll')">
-      <HintPath>$(GameInteropPath)\Unity.Addressables.dll</HintPath>
-      <Private>false</Private>
-    </Reference>
-    <Reference Include="Sabotage.Graph"
-               Condition="Exists('$(GameInteropPath)\Sabotage.Graph.dll')">
-      <HintPath>$(GameInteropPath)\Sabotage.Graph.dll</HintPath>
-    </Reference>
-    <Reference Include="Unity.ResourceManager"
-               Condition="Exists('$(GameInteropPath)\Unity.ResourceManager.dll')">
-      <HintPath>$(GameInteropPath)\Unity.ResourceManager.dll</HintPath>
-      <Private>false</Private>
-    </Reference>
-    <Reference Include="UnityEngine.ImageConversionModule"
-               Condition="Exists('$(GameInteropPath)\UnityEngine.ImageConversionModule.dll')">
-      <HintPath>$(GameInteropPath)\UnityEngine.ImageConversionModule.dll</HintPath>
       <Private>false</Private>
     </Reference>
   </ItemGroup>

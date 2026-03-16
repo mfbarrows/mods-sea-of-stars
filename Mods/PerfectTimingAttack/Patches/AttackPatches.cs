@@ -23,6 +23,12 @@ static class Patch_CanAutoTimeHit
     {
         if (moveDefinition != null && moveDefinition.name.Contains("FanOfKnives"))
             return; // handled by PerfectTimingVenomFlurry
+        if (moveDefinition != null &&
+            (moveDefinition.name.Contains("LeapFrog") || moveDefinition.name.Contains("HeapFrog")))
+            return; // handled by PerfectTimingLeapFrog
+        if (moveDefinition != null &&
+            (moveDefinition.name.Contains("Jugglenaut") || moveDefinition.name.Contains("Jugglecore")))
+            return; // handled by PerfectTimingJugglenaut
         __result = true;
     }
 }
